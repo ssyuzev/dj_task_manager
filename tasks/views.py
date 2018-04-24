@@ -61,7 +61,8 @@ def check_task_title(request):
             print(q)
             if q:
                 data = {
-                    'is_exist': Task.objects.filter(title__istartswith=q).exists()
+                    'is_exist': Task.objects.filter(
+                        title__istartswith=q).exists()
                 }
             else:
                 data = {
