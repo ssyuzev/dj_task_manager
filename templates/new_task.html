@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item active">New Task</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Add new task</h3>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% include 'includes/form.html' %}
+            <button type="submit" class="btn btn-primary btn-block">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="modalAlert" tabindex="-1" role="dialog" aria-labelledby="modalAlert" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Attention!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Task with this title already exists. <br>
+          Try to change few start letters or keep texting.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  $("#id_title").keyup(function(){
+      var title_text = $('#id_title').val();
+      if (title_text.length>3) {
+        $.ajax({
+          type: "GET",
+          url: "{% url "check_task_title" %}",
+          data: {
+            'search_text' : title_text,
+            'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val()
+        },
+           dataType: "json",
+           success: function(data) {
+              if (data.is_exist) {
+                //alert("Task with this title already exists.");
+                $('#modalAlert').modal('show');
+              }
+            },
+            error: function(response, e, e2) {
+              console.log(response);
+            }
+        });
+      }
+    })
+  </script>
+{% endblock %}

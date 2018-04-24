@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item active">Tasks List</li>
+{% endblock %}
+
+{% block content %}
+
+  <form class="form-inline" method="post">
+    {% csrf_token %}
+    <select name="category" data-placeholder="Choose Category" class="form-control mr-2">
+      <option {% if category == 'all' %} selected="selected" {% endif %} value="all">All Categories</option>
+      {% if categories %}
+        {% for c, i in categories %}
+          <option {% if category == c|stringformat:"s" %} selected="selected" {% endif %} value="{{c}}">{{i}}</option>
+        {% endfor %}
+      {% endif %}
+    </select>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" id="all" type="radio" name="types" value="all" {% if 'all' in types %} checked {% endif %}>
+      <label class="form-check-label" for="all">Show all</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" id="author" type="radio" name="types" value="author" {% if 'author' in types %} checked {% endif %}>
+      <label class="form-check-label" for="author">I'm the author</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" id="performer" type="radio" name="types" value="performer" {% if 'performer' in types %} checked {% endif %}>
+      <label class="form-check-label" for="performer">I'm the performer</label>
+    </div>
+    <button type="submit" class="btn btn-default mb-2">Filter</button>
+  </form>
+  <a href="{% url 'new' %}" class="btn btn-primary mb-3 float-right">New Task</a>
+  {% if tasks %}
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Tags</th>
+        <th>Due Date</th>
+        <th>Author</th>
+        <th>Performers</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+        <tr>
+          <td>
+            <a href="#">{{ task.title }}</a>
+            <small class="text-muted d-block">{{ task.description }}</small>
+          </td>
+          <td class="align-middle">
+            {{task.category }}
+          </td>
+          <td class="align-middle">
+            {{ task.tag }}
+          </td>
+          <td class="align-middle">
+            {{ task.due_date }}
+          </td>
+          <td class="align-middle">
+            {{ task.author.username }}
+          </td>
+          <td class="align-middle">
+            {% if task.performers %}
+              {% for performer in task.performers.all %}
+                {{ performer.username }}{% if not forloop.last%},{% endif %}
+              {% endfor %}
+            {% endif%}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="container">
+      <span>Sorry, no tasks in this category.</span>
+    </div>
+  {% endif %}
+{% endblock %}
